@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Demo de Autenticación</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .container {
+        display: flex;
+        gap: 20px;
+      }
+      .form-container {
+        flex: 1;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      .log-container {
+        flex: 1;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f5f5f5;
+        font-family: monospace;
+        height: 400px;
+        overflow-y: auto;
+      }
+      input,
+      button {
+        display: block;
+        margin: 10px 0;
+        padding: 8px;
+        width: 100%;
+      }
+      button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      .log-entry {
+        margin: 5px 0;
+        padding: 5px;
+        border-bottom: 1px solid #ddd;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Demo de Autenticación</h1>
+    <div class="container">
+      <div class="form-container">
+        <h2>Registro</h2>
+        <input type="text" id="register-username" placeholder="Usuario" />
+        <input
+          type="password"
+          id="register-password"
+          placeholder="Contraseña"
+        />
+        <button onclick="register()">Registrar</button>
+
+        <h2>Login</h2>
+        <input type="text" id="login-username" placeholder="Usuario" />
+        <input type="password" id="login-password" placeholder="Contraseña" />
+        <button onclick="login()">Login</button>
+
+        <h2>Acciones</h2>
+        <button onclick="getProfile()">Ver Perfil</button>
+        <button onclick="logout()">Logout</button>
+      </div>
+      <div class="log-container" id="log">
+        <div class="log-entry">
+          Inicia sesión para ver el flujo de la petición...
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const logContainer = document.getElementById("log");
+
+      function addLog(message) {
+        const logEntry = document.createElement("div");
+        logEntry.className = "log-entry";
+        logEntry.textContent = message;
+        logContainer.appendChild(logEntry);
+        logContainer.scrollTop = logContainer.scrollHeight;
+      }
+
+      async function register() {
+        const username = document.getElementById("register-username").value;
+        const password = document.getElementById("register-password").value;
+
+        addLog("📝 Enviando petición de registro...");
+
+        try {
+          const response = await fetch("/api/auth/register", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username, password }),
+          });
+
+          const data = await response.json();
+          addLog(`✅ Respuesta: ${JSON.stringify(data)}`);
+        } catch (error) {
+          addLog(`❌ Error: ${error.message}`);
+        }
+      }
+
+      async function login() {
+        const username = document.getElementById("login-username").value;
+        const password = document.getElementById("login-password").value;
+
+        addLog("🔐 Enviando petición de login...");
+
+        try {
+          const response = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username, password }),
+          });
+
+          const data = await response.json();
+          addLog(`✅ Respuesta: ${JSON.stringify(data)}`);
+        } catch (error) {
+          addLog(`❌ Error: ${error.message}`);
+        }
+      }
+
+      async function getProfile() {
+        addLog("👤 Enviando petición al perfil...");
+
+        try {
+          const response = await fetch("/api/auth/profile", {
+            method: "GET",
+            credentials: "include",
+          });
+
+          const data = await response.json();
+          addLog(`✅ Respuesta: ${JSON.stringify(data)}`);
+        } catch (error) {
+          addLog(`❌ Error: ${error.message}`);
+        }
+      }
+
+      async function logout() {
+        addLog("🚪 Enviando petición de logout...");
+
+        try {
+          const response = await fetch("/api/auth/logout", {
+            method: "POST",
+            credentials: "include",
+          });
+
+          const data = await response.json();
+          addLog(`✅ Respuesta: ${JSON.stringify(data)}`);
+        } catch (error) {
+          addLog(`❌ Error: ${error.message}`);
+        }
+      }
+    </script>
+  </body>
+</html>
